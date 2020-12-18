@@ -5,9 +5,11 @@ import time
 import urllib
 import fake_useragent
 import transliterate
+import datetime
 
 
-
+now = datetime.datetime.now()
+date = now.strftime("%d-%m-%Y %H:%M")
 HEADERS = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:82.0) Gecko/20100101 Firefox/82.0', 'accept': '*/*'}
 
 HOST = 'https://2676270.ru'
@@ -71,7 +73,7 @@ def get_content(html):
             text5 = text4.replace('</p>]', '')   
             text6 = text5.replace(']', '')   
             text7 = text6.replace('<p><span>', '')     
-            print(text7)
+            
 
             # Ищем все вариации товара
             soupvarimgs = soup2.findAll('div', class_='img')
@@ -141,13 +143,15 @@ def parse():
                 html = get_html(URL, params={'PAGEN_1': page})
                 catalog.extend(get_content(html.text))
                 time.sleep(1)
-            FILE = URL[33:-1] + 'ghk' + '.csv'   
+            FILE = URL[33:-1] + date + '.csv'   
             save_file(catalog, FILE)
 
 
             print(f'Получено {len(catalog)} товаров')
         else:
-            print('Error')    
+            print('Error')  
+
+
 
 
 
