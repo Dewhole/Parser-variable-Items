@@ -100,6 +100,105 @@ def get_content(html):
 
             colorsAtribute = []
             # пробегаемся по всем вариациям товара
+
+            
+            for soupvar in soupvarimgs:
+                counter += 1 
+
+                # Парсим ссылка на картинку вариации
+                soupvarimg = soupvar.find('a')
+                if soupvarimg:
+                    soupvarimg = HOST + soupvar.find('a').get('href')
+                else:
+                    soupvarimg = ''
+                
+                # Парсим цвет вариации и добавляем в список
+                colors = soupvar.find('img').get('alt')
+                colorsAtribute.append(colors)
+                
+
+
+            
+            # Записываем родительский товар
+            colorsAtributeString = ', '.join(colorsAtribute)
+            imagelink = HOST + soupimage.find('img').get('src') 
+            title = soup2.find('h1', class_='heading').get_text(strip=True)
+            Type = 'variable'  
+            catalog.append({
+                'title': title,
+                'kategory': 'ПРЯЖА' + ' > ' + kategory,
+                'image': imagelink,
+                'text': text7,
+                'cost': cost8,
+                'visible': 'visible',
+                'Type': Type,
+                'SKU': title,
+                'parent': '',
+                'Attribute 1 name': 'Цвет',
+                'Attribute 1 value(s)': colorsAtributeString,
+            })        
+
+    for item in items:
+        anchors = item.find_all("a")
+        
+        for a in anchors:
+            
+   
+            
+
+            # Получаем страницу товара
+            titles = HOST + a.get('href')
+          
+            print(titles)
+
+            # Обращаемся к этой странице
+            html2 = get_html(titles)
+            # Получаем суп
+            soup2 = BeautifulSoup(html2.text, 'html.parser')
+            
+            # парсим ссылку на картинку
+            soupimage = soup2.find('div', class_='product_img')
+            imagelink = HOST + soupimage.find('img').get('src') 
+
+            # парсим цену товара плюс наценка            
+            cost = soup2.find('div', class_='price').get_text(strip=True)
+            cost3 = cost.replace('руб.', '')
+            cost33 = cost3.replace(' ', '')
+            intcost = float(cost33)
+            cost5 = intcost * 0.5 + intcost
+            cost5 = float('{:.0f}'.format(cost5))
+            cost7 = str(cost5)
+            cost8 = cost7[:-2]
+
+
+            # парсим категорию товара
+            soupkategory = soup2.find('div', class_='breadcrumbs')
+            kategory = soupkategory.findAll('a')[4].text
+
+            # парсим описание, заменяемые значения можно заменить на словарь
+            souptext = soup2.find('div', class_='info')
+            text = souptext.findAll('p')[0:3]
+            text1 = str(text)
+            text2 = text1.replace('[<p><span>', '')
+            text3 = text2.replace('</span>', '')
+            text4 = text3.replace('</p>', '')           
+            text5 = text4.replace('</p>]', '')   
+            text6 = text5.replace(']', '')   
+            text7 = text6.replace('<p><span>', '')     
+         
+
+            
+            # Ищем все вариации товара
+            
+            soupvarimgs = soup2.findAll('div', class_='img')
+            
+            # Счётчик цикла
+            counter = 0
+
+            colorsAtribute = []
+            # пробегаемся по всем вариациям товара
+
+            
             for soupvar in soupvarimgs:
                 counter += 1 
 
@@ -146,27 +245,8 @@ def get_content(html):
                     'parent': parent,
                     'Attribute 1 name': 'Цвет',
                     'Attribute 1 value(s)': colors,
-                })
-            
+                })            
 
-            # Записываем родительский товар
-            colorsAtributeString = ', '.join(colorsAtribute)
-            imagelink = HOST + soupimage.find('img').get('src') 
-            title = soup2.find('h1', class_='heading').get_text(strip=True)
-            Type = 'variable'  
-            catalog.append({
-                'title': title,
-                'kategory': 'ПРЯЖА' + ' > ' + kategory,
-                'image': imagelink,
-                'text': text7,
-                'cost': cost8,
-                'visible': 'visible',
-                'Type': Type,
-                'SKU': title,
-                'parent': '',
-                'Attribute 1 name': 'Цвет',
-                'Attribute 1 value(s)': colorsAtributeString,
-            })        
         return catalog      
         
             
@@ -186,13 +266,13 @@ def save_file(items, path):
 # Основная функция Создаём каталог
 def parse():
     for URL in [
-'https://2676270.ru/catalog/yarn/92/',
-'https://2676270.ru/catalog/yarn/93/',
+
+
+
 'https://2676270.ru/catalog/yarn/1419/'
-'https://2676270.ru/catalog/yarn/1677/',
-'https://2676270.ru/catalog/yarn/2453/',
-'https://2676270.ru/catalog/yarn/909/',
-'https://2676270.ru/catalog/yarn/95/'
+
+
+
     ]:
 
         html = get_html(URL)
